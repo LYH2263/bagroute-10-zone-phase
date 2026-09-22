@@ -13,14 +13,16 @@ def seed_if_empty(db: Session) -> None:
     db.flush()
     db.add_all(
         [
-            SubscriberStop(route_id=r1.id, seq=1, name="松林里 3 栋", weight_kg=2.2, volume_l=4.0),
-            SubscriberStop(route_id=r1.id, seq=2, name="梧桐苑门岗", weight_kg=3.5, volume_l=5.5),
-            SubscriberStop(route_id=r1.id, seq=3, name="地铁口快递柜", weight_kg=1.8, volume_l=3.0),
-            SubscriberStop(route_id=r1.id, seq=4, name="超大件样例", weight_kg=9.5, volume_l=6.0),
-            SubscriberStop(route_id=r1.id, seq=5, name="咖啡店后门", weight_kg=2.0, volume_l=4.5),
-            SubscriberStop(route_id=r2.id, seq=1, name="A 座前台", weight_kg=1.5, volume_l=3.0),
-            SubscriberStop(route_id=r2.id, seq=2, name="B 座茶水间", weight_kg=2.0, volume_l=4.0),
-            SubscriberStop(route_id=r2.id, seq=3, name="地下车库岗亭", weight_kg=2.8, volume_l=5.0),
+            # 地铁口快递柜（后段，seq 3）顺序上早于前段的超大件样例与咖啡店后门，
+            # 须等前段各站入袋或拒收后才开后段袋。
+            SubscriberStop(route_id=r1.id, seq=1, name="松林里 3 栋", weight_kg=2.2, volume_l=4.0, segment="front"),
+            SubscriberStop(route_id=r1.id, seq=2, name="梧桐苑门岗", weight_kg=3.5, volume_l=5.5, segment="front"),
+            SubscriberStop(route_id=r1.id, seq=3, name="地铁口快递柜", weight_kg=1.0, volume_l=2.5, segment="back"),
+            SubscriberStop(route_id=r1.id, seq=4, name="超大件样例", weight_kg=9.5, volume_l=6.0, segment="front"),
+            SubscriberStop(route_id=r1.id, seq=5, name="咖啡店后门", weight_kg=1.2, volume_l=3.0, segment="front"),
+            SubscriberStop(route_id=r2.id, seq=1, name="A 座前台", weight_kg=1.5, volume_l=3.0, segment="front"),
+            SubscriberStop(route_id=r2.id, seq=2, name="B 座茶水间", weight_kg=2.0, volume_l=4.0, segment="front"),
+            SubscriberStop(route_id=r2.id, seq=3, name="地下车库岗亭", weight_kg=2.0, volume_l=4.0, segment="back"),
         ]
     )
     db.commit()

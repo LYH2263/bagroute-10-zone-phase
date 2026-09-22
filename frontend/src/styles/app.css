@@ -243,6 +243,44 @@ button {
   background: transparent;
 }
 .stop-chip .seq { color: var(--route-leaf); font-family: "IBM Plex Mono", monospace; font-size: .8rem; }
+
+/* segment (前段/后段) badges + stops-page filter */
+.seg-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: .08rem .5rem;
+  border-radius: 999px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+.seg-badge--front { background: var(--route-leaf); color: #142008; }
+.seg-badge--back { background: #3a6a8a; color: #eaf6ff; }
+.seg-filter { display: flex; gap: 4px; }
+.seg-filter button {
+  background: var(--panel);
+  color: var(--route-muted);
+  border: 1px solid var(--line);
+  font-weight: 400;
+  padding: .4rem .8rem;
+}
+.seg-filter button.on {
+  background: var(--route-leaf);
+  color: #142008;
+  border-color: #d4f08a;
+  font-weight: 700;
+}
+.seg-toggle {
+  align-self: flex-start;
+  margin-top: .2rem;
+  padding: .2rem .5rem;
+  font-size: .7rem;
+  background: transparent;
+  color: var(--route-muted);
+  border: 1px dashed var(--line);
+  font-weight: 400;
+}
+.seg-toggle:hover { color: var(--text); border-color: var(--route-muted); }
 .bag-row { display: flex; gap: 6px; flex-wrap: wrap; margin: .5rem 0 1rem; }
 .bag-block {
   background: var(--bag); color: white; border-radius: 4px;

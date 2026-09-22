@@ -1,8 +1,19 @@
-"""Route-order bag packing with weight + volume caps; reject when exceed."""
+"""Route-order bag packing with weight + volume caps; reject when exceed.
+
+Segments: each stop belongs to the route's front (前段) or back (后段)
+segment. Packing still follows seq within a segment, but the whole front
+segment is settled first: no back bag opens while any front stop is
+unprocessed (neither bagged nor rejected), and back stops never enter a
+bag that holds front stops. A rejected front stop counts as processed and
+does not block the back segment.
+"""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+
+FRONT = "front"
+BACK = "back"
 
 
 @dataclass(frozen=True)
@@ -12,11 +23,13 @@ class StopItem:
     weight_kg: float
     volume_l: float
     label: str = ""
+    segment: str = FRONT
 
 
 @dataclass
 class Bag:
     bag_index: int
+    segment: str = FRONT
     items: list[StopItem] = field(default_factory=list)
     weight_kg: float = 0.0
     volume_l: float = 0.0
@@ -35,16 +48,15 @@ def can_fit(bag: Bag, item: StopItem, max_weight: float, max_volume: float) -> b
     )
 
 
-def pack_route(
-    stops: list[StopItem],
+def _pack_segment(
+    ordered: list[StopItem],
+    segment: str,
+    bags: list[Bag],
+    rejects: list[tuple[StopItem, str]],
     max_weight: float,
     max_volume: float,
-) -> PackResult:
-    ordered = sorted(stops, key=lambda s: s.seq)
-    bags: list[Bag] = []
-    rejects: list[tuple[StopItem, str]] = []
+) -> None:
     current: Bag | None = None
-
     for item in ordered:
         if item.weight_kg > max_weight or item.volume_l > max_volume:
             reason = []
@@ -56,7 +68,7 @@ def pack_route(
             continue
 
         if current is None or not can_fit(current, item, max_weight, max_volume):
-            current = Bag(bag_index=len(bags) + 1)
+            current = Bag(bag_index=len(bags) + 1, segment=segment)
             bags.append(current)
 
         if not can_fit(current, item, max_weight, max_volume):
@@ -67,5 +79,35 @@ def pack_route(
         current.items.append(item)
         current.weight_kg += item.weight_kg
         current.volume_l += item.volume_l
+
+
+def pack_route(
+    stops: list[StopItem],
+    max_weight: float,
+    max_volume: float,
+) -> PackResult:
+    ordered = sorted(stops, key=lambda s: s.seq)
+    bags: list[Bag] = []
+    rejects: list[tuple[StopItem, str]] = []
+
+    # Front segment is fully settled (bagged or rejected) before the first
+    # back bag opens, so back stops never share a bag with front stops and a
+    # rejected front stop never blocks the back segment.
+    _pack_segment(
+        [s for s in ordered if s.segment != BACK],
+        FRONT,
+        bags,
+        rejects,
+        max_weight,
+        max_volume,
+    )
+    _pack_segment(
+        [s for s in ordered if s.segment == BACK],
+        BACK,
+        bags,
+        rejects,
+        max_weight,
+        max_volume,
+    )
 
     return PackResult(bags=bags, rejects=rejects)

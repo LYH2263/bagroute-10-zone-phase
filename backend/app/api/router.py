@@ -11,6 +11,7 @@ from app.schemas.schemas import (
     RejectOut,
     RouteOut,
     StopOut,
+    StopSegmentUpdate,
     WeightOut,
 )
 from app.services.pack_engine import StopItem, pack_route
@@ -29,11 +30,27 @@ def routes(db: Session = Depends(get_db)):
 
 
 @api_router.get("/stops", response_model=list[StopOut])
-def stops(route_id: int | None = None, db: Session = Depends(get_db)):
+def stops(
+    route_id: int | None = None,
+    segment: str | None = None,
+    db: Session = Depends(get_db),
+):
     q = select(SubscriberStop).order_by(SubscriberStop.route_id, SubscriberStop.seq)
     if route_id is not None:
         q = q.where(SubscriberStop.route_id == route_id)
+    if segment is not None:
+        q = q.where(SubscriberStop.segment == segment)
     return db.scalars(q).all()
+
+
+@api_router.patch("/stops/{stop_id}", response_model=StopOut)
+def update_stop_segment(stop_id: int, body: StopSegmentUpdate, db: Session = Depends(get_db)):
+    stop = db.get(SubscriberStop, stop_id)
+    if not stop:
+        raise HTTPException(404, "订户点不存在")
+    stop.segment = body.segment
+    db.commit()
+    return stop
 
 
 @api_router.post("/pack", response_model=list[BagOut])
@@ -56,7 +73,7 @@ def pack(body: PackRequest, db: Session = Depends(get_db)):
         select(SubscriberStop).where(SubscriberStop.route_id == route.id).order_by(SubscriberStop.seq)
     ).all()
     items = [
-        StopItem(s.id, s.seq, s.weight_kg, s.volume_l, s.name) for s in stops
+        StopItem(s.id, s.seq, s.weight_kg, s.volume_l, s.name, s.segment) for s in stops
     ]
     result = pack_route(items, route.max_weight_kg, route.max_volume_l)
     out_bags: list[PackBag] = []
@@ -64,6 +81,7 @@ def pack(body: PackRequest, db: Session = Depends(get_db)):
         row = PackBag(
             route_id=route.id,
             bag_index=bag.bag_index,
+            segment=bag.segment,
             weight_kg=round(bag.weight_kg, 3),
             volume_l=round(bag.volume_l, 3),
         )
@@ -95,6 +113,7 @@ def pack(body: PackRequest, db: Session = Depends(get_db)):
             id=b.id,
             route_id=b.route_id,
             bag_index=b.bag_index,
+            segment=b.segment,
             weight_kg=b.weight_kg,
             volume_l=b.volume_l,
             items=[
@@ -122,6 +141,7 @@ def bags(db: Session = Depends(get_db)):
                 id=b.id,
                 route_id=b.route_id,
                 bag_index=b.bag_index,
+                segment=b.segment,
                 weight_kg=b.weight_kg,
                 volume_l=b.volume_l,
                 items=[

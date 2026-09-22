@@ -1,5 +1,9 @@
 from datetime import datetime
+from typing import Literal
+
 from pydantic import BaseModel
+
+Segment = Literal["front", "back"]
 
 
 class RouteOut(BaseModel):
@@ -17,7 +21,12 @@ class StopOut(BaseModel):
     name: str
     weight_kg: float
     volume_l: float
+    segment: Segment = "front"
     model_config = {"from_attributes": True}
+
+
+class StopSegmentUpdate(BaseModel):
+    segment: Segment
 
 
 class BagItemOut(BaseModel):
@@ -31,6 +40,7 @@ class BagOut(BaseModel):
     id: int
     route_id: int
     bag_index: int
+    segment: Segment = "front"
     weight_kg: float
     volume_l: float
     items: list[BagItemOut] = []

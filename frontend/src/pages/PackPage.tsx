@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client";
 type R = { id: number; name: string };
-type Bag = { id: number; bag_index: number; weight_kg: number; volume_l: number; items: { stop_name: string }[] };
+type Seg = "front" | "back";
+type Bag = { id: number; bag_index: number; segment: Seg; weight_kg: number; volume_l: number; items: { stop_name: string }[] };
+const SEG_LABEL: Record<Seg, string> = { front: "前段", back: "后段" };
 export default function PackPage() {
   const [routes, setRoutes] = useState<R[]>([]);
   const [rid, setRid] = useState<number | "">("");
@@ -26,7 +28,7 @@ export default function PackPage() {
     {err && <div className="err">{err}</div>}
     {bags.map(b => (
       <div key={b.id}>
-        <div className="mono">袋 {b.bag_index} · {b.weight_kg}kg / {b.volume_l}L</div>
+        <div className="mono">袋 {b.bag_index} <span className={`seg-badge seg-badge--${b.segment}`}>{SEG_LABEL[b.segment] ?? b.segment}</span> · {b.weight_kg}kg / {b.volume_l}L</div>
         <div className="bag-row">{b.items.map((it, i) => <div className="bag-block" key={i}>{it.stop_name}</div>)}</div>
       </div>
     ))}

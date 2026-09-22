@@ -23,6 +23,7 @@ class SubscriberStop(Base):
     name: Mapped[str] = mapped_column(String(80))
     weight_kg: Mapped[float] = mapped_column(Float)
     volume_l: Mapped[float] = mapped_column(Float)
+    segment: Mapped[str] = mapped_column(String(8), default="front")
     route: Mapped[DeliveryRoute] = relationship(back_populates="stops")
 
 
@@ -31,6 +32,7 @@ class PackBag(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     route_id: Mapped[int] = mapped_column(ForeignKey("delivery_routes.id"))
     bag_index: Mapped[int] = mapped_column(Integer)
+    segment: Mapped[str] = mapped_column(String(8), default="front")
     weight_kg: Mapped[float] = mapped_column(Float)
     volume_l: Mapped[float] = mapped_column(Float)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
