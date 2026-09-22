@@ -250,3 +250,62 @@ button {
 }
 .fill { height: 10px; background: #2a3824; border-radius: 2px; overflow: hidden; }
 .fill > span { display: block; height: 100%; background: var(--accent); }
+
+/* —— 前/后段：前段叶绿，后段蓝 —— */
+:root {
+  --seg-front: var(--route-leaf);
+  --seg-rear: #7ec8e8;
+}
+.seg-badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: .05rem .5rem;
+  font-size: .72rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.seg-badge--front { background: var(--seg-front); color: #142008; }
+.seg-badge--rear { background: var(--seg-rear); color: #0a1c26; }
+
+.seg-filter { display: inline-flex; gap: 4px; }
+.seg-btn {
+  background: #121a10;
+  color: var(--route-muted);
+  border: 1px solid #3a4a32;
+  border-radius: 999px;
+  padding: .32rem .8rem;
+  font-size: .78rem;
+  font-weight: 400;
+  cursor: pointer;
+}
+.seg-btn:hover { color: var(--text); }
+.seg-btn--on {
+  background: var(--route-leaf);
+  color: #142008;
+  border-color: #d4f08a;
+  font-weight: 700;
+}
+
+.stop-chip--front { border-left-color: var(--seg-front); }
+.stop-chip--rear { border-left-color: var(--seg-rear); }
+.seg-toggle {
+  margin-top: .25rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--route-muted);
+  font-size: .68rem;
+  font-weight: 400;
+  padding: .2rem .35rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  align-self: flex-start;
+}
+.seg-toggle:hover { color: var(--text); border-color: var(--route-muted); }
+
+.stop-bead-dot--rear {
+  background: var(--seg-rear);
+  box-shadow: 0 0 0 2px #3a6a8a;
+}

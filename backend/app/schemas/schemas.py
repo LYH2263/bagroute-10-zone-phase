@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class RouteOut(BaseModel):
@@ -17,7 +17,12 @@ class StopOut(BaseModel):
     name: str
     weight_kg: float
     volume_l: float
+    segment: str
     model_config = {"from_attributes": True}
+
+
+class StopSegmentUpdate(BaseModel):
+    segment: str = Field(pattern="^(front|rear)$")
 
 
 class BagItemOut(BaseModel):
@@ -33,6 +38,7 @@ class BagOut(BaseModel):
     bag_index: int
     weight_kg: float
     volume_l: float
+    segment: str
     items: list[BagItemOut] = []
     model_config = {"from_attributes": True}
 

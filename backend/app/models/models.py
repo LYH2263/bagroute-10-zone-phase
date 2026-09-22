@@ -4,6 +4,7 @@ from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from app.services.pack_engine import SEG_FRONT
 
 
 class DeliveryRoute(Base):
@@ -23,6 +24,8 @@ class SubscriberStop(Base):
     name: Mapped[str] = mapped_column(String(80))
     weight_kg: Mapped[float] = mapped_column(Float)
     volume_l: Mapped[float] = mapped_column(Float)
+    # 段别：front 前段 / rear 后段；后段站点须等前段全部处理（入袋或拒收）后才装袋
+    segment: Mapped[str] = mapped_column(String(8), default=SEG_FRONT)
     route: Mapped[DeliveryRoute] = relationship(back_populates="stops")
 
 
@@ -33,6 +36,8 @@ class PackBag(Base):
     bag_index: Mapped[int] = mapped_column(Integer)
     weight_kg: Mapped[float] = mapped_column(Float)
     volume_l: Mapped[float] = mapped_column(Float)
+    # 袋所属段别，由袋内首个入袋站点决定
+    segment: Mapped[str] = mapped_column(String(8), default=SEG_FRONT)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     items: Mapped[list["BagItem"]] = relationship(back_populates="bag")
 

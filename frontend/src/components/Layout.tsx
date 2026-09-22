@@ -11,7 +11,7 @@ const stripLinks = [
   ["/weights", "袋重"],
 ];
 
-type Stop = { id: number; route_id: number; seq: number; name: string; weight_kg: number; volume_l: number };
+type Stop = { id: number; route_id: number; seq: number; name: string; weight_kg: number; volume_l: number; segment: string };
 type Route = { id: number; name: string };
 type Weight = {
   bag_id: number;
@@ -95,9 +95,9 @@ export default function Layout() {
           )}
           {stops.map((s, i) => (
             <div key={s.id} className="stop-bead" style={{ zIndex: stops.length - i }}>
-              <div className="stop-bead-dot" />
+              <div className={`stop-bead-dot stop-bead-dot--${s.segment === "rear" ? "rear" : "front"}`} />
               <div className="stop-bead-card">
-                <span className="stop-bead-seq">#{s.seq}</span>
+                <span className="stop-bead-seq">#{s.seq} · {s.segment === "rear" ? "后段" : "前段"}</span>
                 <strong>{s.name}</strong>
                 <span className="mono">
                   {s.weight_kg}kg · {s.volume_l}L
